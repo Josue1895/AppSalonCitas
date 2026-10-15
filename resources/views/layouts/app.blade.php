@@ -49,7 +49,7 @@
                         <a class="nav-link" href="{{ route('home') }}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('citas.index') }}">Reservar Cita</a>
+                        <a class="nav-link" href="{{ route('citas.index') }}">vamos a reservar una cita</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('citas.mis') }}">Mis Citas</a>
