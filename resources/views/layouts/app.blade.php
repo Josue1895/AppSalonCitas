@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'AppSalon')</title>
+    <title>@yield('title', 'Aurea')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #f8f9fa, #eef2f7);
+            background: linear-gradient(135deg, #fafcff, #fefeff);
             min-height: 100vh;
         }
 
@@ -16,11 +16,11 @@
         }
 
         .hero-box {
-            background: linear-gradient(135deg, #212529, #495057);
+            background: linear-gradient(135deg, #394b62, #26374f);
             color: white;
             border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 25px rgba(218, 217, 217, 0.04);
         }
 
         .card {
@@ -29,24 +29,30 @@
 
         .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.10) !important;
+            box-shadow: 0 12px 25px rgba(30, 28, 28, 0.81) !important;
         }
 
         .section-title {
             font-weight: 700;
         }
     </style>
+
+    {{-- Estilos extra que agregue para cada vista (por ejemplo la portada) --}}
+    @stack('styles')
 </head>
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('home') }}">AppSalon</a>
+            <a class="navbar-brand fw-bold" href="{{ route('home') }}">Aurea</a>
 
             <div class="collapse navbar-collapse show">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('servicios.index') }}">Servicios</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('citas.index') }}">vamos a reservar una cita</a>
@@ -113,5 +119,8 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- Scripts extra que agregue para cada vista (por ejemplo el simulador que esta en la portada :3 --}}
+    @stack('scripts')
 </body>
 </html>
