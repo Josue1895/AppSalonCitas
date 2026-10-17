@@ -6,7 +6,7 @@
     <div class="hero-box mb-5">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="fw-bold mb-3">Bienvenido a AppSalon</h1>
+                <h1 class="fw-bold mb-3">Bienvenido a Aurea</h1>
                 <p class="mb-3 fs-5">
                     Gestiona tus citas de belleza de forma rápida, segura y sencilla.
                 </p>

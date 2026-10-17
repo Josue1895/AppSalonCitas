@@ -5,8 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PasswordResetController;
 
-Route::get('/', [ServiceController::class, 'index'])->name('home');
+// nueva pagina de inicio
+Route::view('/', 'landing')->name('home');
 
 // Autenticación
 Route::get('/registro', [AuthController::class, 'showRegister'])->name('registro');
@@ -25,6 +27,20 @@ Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index
 Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.store');
 Route::get('/mis-citas', [AppointmentController::class, 'misCitas'])->name('citas.mis');
 Route::post('/mis-citas/cancelar/{id}', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
+
+// nueva funcionalidad para recuperar contraseña
+
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])
+    ->name('password.request');
+
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+    ->name('password.email');
+
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])
+    ->name('password.reset');
+
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+    ->name('password.update');
 
 // Admin protegido
 Route::middleware('admin')->group(function () {
