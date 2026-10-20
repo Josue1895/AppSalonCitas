@@ -6,6 +6,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ReportController;
 
 // nueva pagina de inicio
 Route::view('/', 'landing')->name('home');
@@ -53,4 +54,7 @@ Route::post('/admin/servicios/actualizar/{id}', [ServiceController::class, 'upda
 Route::post('/admin/servicios/eliminar/{id}', [ServiceController::class, 'destroy'])->name('admin.servicios.destroy');
 Route::get('/admin/citas', [AdminController::class, 'citas'])->name('admin.citas');
 Route::post('/admin/citas/estado/{id}', [AdminController::class, 'cambiarEstado'])->name('admin.citas.estado');
+    Route::get('/admin/reportes', [ReportController::class, 'index'])->name('admin.reportes');
+    Route::get('/admin/reportes/pdf', [ReportController::class, 'pdf'])->name('admin.reportes.pdf');
+    Route::get('/admin/reportes/excel', [ReportController::class, 'excel'])->name('admin.reportes.excel');
 });

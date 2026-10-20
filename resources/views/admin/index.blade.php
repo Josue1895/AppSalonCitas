@@ -40,5 +40,6 @@
     <div class="d-flex gap-2 flex-wrap">
         <a href="{{ route('admin.servicios.index') }}" class="btn btn-outline-dark">Gestionar Servicios</a>
         <a href="{{ route('admin.citas') }}" class="btn btn-outline-primary">Gestionar Citas</a>
+        <a href="{{ route('admin.reportes') }}" class="btn btn-outline-primary">Ver Reportes</a>
     </div>
 @endsection
