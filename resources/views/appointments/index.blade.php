@@ -21,12 +21,34 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Fecha</label>
-                                <input type="date" name="fecha" value="{{ old('fecha') }}" class="form-control">
+                                <input
+                                    type="date"
+                                    name="fecha"
+                                    value="{{ old('fecha') }}"
+                                    min="{{ now()->toDateString() }}"
+                                    class="form-control @error('fecha') is-invalid @enderror"
+                                    id="fecha-cita"
+                                >
+                                @error('fecha')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Hora</label>
-                                <input type="time" name="hora" value="{{ old('hora') }}" class="form-control">
+                                <input
+                                    type="time"
+                                    name="hora"
+                                    value="{{ old('hora') }}"
+                                    class="form-control @error('hora') is-invalid @enderror"
+                                    id="hora-cita"
+                                    data-fecha-actual="{{ now()->toDateString() }}"
+                                    data-hora-actual="{{ now()->format('H:i') }}"
+                                >
+                                @error('hora')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div id="hora-cita-aviso" class="text-danger small mt-1" role="alert" aria-live="polite" hidden></div>
                             </div>
                         </div>
 
@@ -60,3 +82,34 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const fechaCita = document.getElementById('fecha-cita');
+        const horaCita = document.getElementById('hora-cita');
+        const avisoHoraCita = document.getElementById('hora-cita-aviso');
+
+        function actualizarHoraMinima() {
+            horaCita.min = fechaCita.value === horaCita.dataset.fechaActual
+                ? horaCita.dataset.horaActual
+                : '';
+
+            validarHoraCita();
+        }
+
+        function validarHoraCita() {
+            const horaAnteriorAlMinimo = horaCita.min && horaCita.value && horaCita.value < horaCita.min;
+
+            horaCita.classList.toggle('is-invalid', Boolean(horaAnteriorAlMinimo));
+            avisoHoraCita.hidden = !horaAnteriorAlMinimo;
+            avisoHoraCita.textContent = horaAnteriorAlMinimo
+                ? `La hora debe ser igual o posterior a las ${horaCita.min} (hora de Bogotá).`
+                : '';
+        }
+
+        fechaCita.addEventListener('change', actualizarHoraMinima);
+        horaCita.addEventListener('input', validarHoraCita);
+        horaCita.addEventListener('change', validarHoraCita);
+        actualizarHoraMinima();
+    </script>
+@endpush
