@@ -6,6 +6,9 @@
     // El botón cambia si hay sesión o no
     $ctaPrincipalUrl   = Auth::check() ? route('citas.index') : route('registro');
     $ctaPrincipalTexto = Auth::check() ? 'Reservar mi cita' : 'Crear mi cuenta';
+
+     // Dirección del salón 
+    $direccion = 'Cra. 24c # 85-29, Cali, Valle del Cauca'; 
 @endphp
 
 @push('styles')
@@ -116,6 +119,25 @@
         @keyframes lpIn {
             to { opacity: 1; transform: none; }
         }
+
+        /* Etiqueta de dirección sobre el título */
+        .lp-address {
+           display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.1rem;
+            padding: 6px 14px 6px 10px;
+            background: rgb(223, 188, 207);
+            border-radius: 999px;
+            color: var(--lp-ink);
+            font-size: .92rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .15s ease;
+       }
+        .lp-address:hover { background: #fff; color: var(--lp-ink); }
+        .lp-address:focus-visible { outline: 3px solid var(--lp-rose-deep); outline-offset: 2px; }
+         .lp-address svg { flex: 0 0 auto; color: var(--lp-rose-deep); }
 
         /* ---------- SIMULADOR DE RESERVA ---------- */
         .lp-book {
@@ -259,6 +281,20 @@
     <section class="lp-hero mb-5">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
+                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($direccion) }}"
+                target="_blank" rel="noopener"
+                class="lp-address lp-in" style="--d:0s">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+             <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/>
+             
+            </svg>
+             {{ $direccion }}
+              </a>
+
+             <h1 class="lp-display mb-3 lp-in" style="--d:.05s">
+                  Tu cita de belleza, sin llamadas ni esperas.
+                </h1>
+
                 <h1 class="lp-display mb-3 lp-in" style="--d:.05s">
                     Tu cita de belleza, sin llamadas ni esperas.
                 </h1>
