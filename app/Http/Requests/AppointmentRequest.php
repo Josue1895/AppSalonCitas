@@ -28,10 +28,17 @@ class AppointmentRequest extends FormRequest
                 return;
             }
 
+            $hora = $this->input('hora');
+
+            if ($hora < '09:00' || $hora > '18:00') {
+                $validator->errors()->add('hora', 'Las citas solo se pueden reservar entre las 9:00 a. m. y las 6:00 p. m.');
+                return;
+            }
+
             $ahora = now();
 
             if ($this->input('fecha') === $ahora->toDateString()
-                && $this->input('hora') < $ahora->format('H:i')) {
+                && $hora < $ahora->format('H:i')) {
                 $validator->errors()->add('hora', 'La hora debe ser igual o posterior a la hora actual.');
             }
         });
@@ -45,6 +52,8 @@ class AppointmentRequest extends FormRequest
             'fecha.after_or_equal' => 'La fecha de la cita no puede ser anterior a hoy.',
             'hora.required' => 'La hora de la cita es obligatoria.',
             'hora.date_format' => 'La hora debe tener un formato válido.',
+            'servicios.required' => 'Debes seleccionar al menos un servicio.',
+            'servicios.min' => 'Debes seleccionar al menos un servicio.',
         ];
     }
 }

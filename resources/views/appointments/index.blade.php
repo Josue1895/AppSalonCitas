@@ -15,7 +15,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('citas.store') }}">
+                    <form id="formulario-cita" method="POST" action="{{ route('citas.store') }}">
                         @csrf
 
                         <div class="row">
@@ -40,6 +40,8 @@
                                     type="time"
                                     name="hora"
                                     value="{{ old('hora') }}"
+                                    min="09:00"
+                                    max="18:00"
                                     class="form-control @error('hora') is-invalid @enderror"
                                     id="hora-cita"
                                     data-fecha-actual="{{ now()->toDateString() }}"
@@ -48,12 +50,19 @@
                                 @error('hora')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div class="form-text">Horario disponible: 9:00 a. m. a 6:00 p. m.</div>
                                 <div id="hora-cita-aviso" class="text-danger small mt-1" role="alert" aria-live="polite" hidden></div>
                             </div>
                         </div>
 
                         <div class="mt-3">
                             <h5 class="fw-bold mb-3">Selecciona los servicios</h5>
+                            @error('servicios')
+                                <div class="alert alert-warning" role="alert">{{ $message }}</div>
+                            @enderror
+                            <div id="servicios-aviso" class="alert alert-warning" role="alert" aria-live="assertive" hidden>
+                                Debes seleccionar al menos un servicio.
+                            </div>
 
                             <div class="row">
                                 @foreach($servicios as $servicio)
@@ -88,24 +97,56 @@
         const fechaCita = document.getElementById('fecha-cita');
         const horaCita = document.getElementById('hora-cita');
         const avisoHoraCita = document.getElementById('hora-cita-aviso');
+        const formularioCita = document.getElementById('formulario-cita');
+        const avisoServicios = document.getElementById('servicios-aviso');
+        const serviciosCita = document.querySelectorAll('input[name="servicios[]"]');
+        const horaMinimaJornada = '09:00';
+        const horaMaximaJornada = '18:00';
 
         function actualizarHoraMinima() {
             horaCita.min = fechaCita.value === horaCita.dataset.fechaActual
+                && horaCita.dataset.horaActual > horaMinimaJornada
                 ? horaCita.dataset.horaActual
-                : '';
+                : horaMinimaJornada;
+            horaCita.max = horaMaximaJornada;
 
             validarHoraCita();
         }
 
         function validarHoraCita() {
-            const horaAnteriorAlMinimo = horaCita.min && horaCita.value && horaCita.value < horaCita.min;
+            const fueraDelHorario = horaCita.value
+                && (horaCita.value < horaMinimaJornada || horaCita.value > horaMaximaJornada);
+            const anteriorAHoraActual = horaCita.min > horaMinimaJornada
+                && horaCita.value
+                && horaCita.value < horaCita.min;
+            const horaInvalida = fueraDelHorario || anteriorAHoraActual;
 
-            horaCita.classList.toggle('is-invalid', Boolean(horaAnteriorAlMinimo));
-            avisoHoraCita.hidden = !horaAnteriorAlMinimo;
-            avisoHoraCita.textContent = horaAnteriorAlMinimo
-                ? `La hora debe ser igual o posterior a las ${horaCita.min} (hora de Bogotá).`
+            horaCita.classList.toggle('is-invalid', Boolean(horaInvalida));
+            avisoHoraCita.hidden = !horaInvalida;
+            avisoHoraCita.textContent = fueraDelHorario
+                ? 'Las citas solo se pueden reservar entre las 9:00 a. m. y las 6:00 p. m.'
+                : anteriorAHoraActual
+                    ? `La hora debe ser igual o posterior a las ${horaCita.min} (hora de Bogotá).`
                 : '';
         }
+
+        formularioCita.addEventListener('submit', function (event) {
+            const hayServicioSeleccionado = Array.from(serviciosCita).some(servicio => servicio.checked);
+
+            if (!hayServicioSeleccionado) {
+                event.preventDefault();
+                avisoServicios.hidden = false;
+                avisoServicios.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        serviciosCita.forEach(servicio => {
+            servicio.addEventListener('change', function () {
+                if (Array.from(serviciosCita).some(servicioSeleccionado => servicioSeleccionado.checked)) {
+                    avisoServicios.hidden = true;
+                }
+            });
+        });
 
         fechaCita.addEventListener('change', actualizarHoraMinima);
         horaCita.addEventListener('input', validarHoraCita);
