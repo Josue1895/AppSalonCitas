@@ -65,4 +65,41 @@ class AppointmentDateValidationTest extends TestCase
         $futureDateResponse->assertRedirect(route('login'));
         $futureDateResponse->assertSessionHasNoErrors();
     }
+
+    public function test_it_rejects_times_outside_the_booking_hours(): void
+    {
+        foreach (['08:59', '18:01'] as $hora) {
+            $response = $this->post(route('citas.store'), [
+                'fecha' => '2026-10-21',
+                'hora' => $hora,
+                'servicios' => [1],
+            ]);
+
+            $response->assertSessionHasErrors('hora');
+        }
+    }
+
+    public function test_it_allows_the_booking_hours_boundaries(): void
+    {
+        foreach (['09:00', '18:00'] as $hora) {
+            $response = $this->post(route('citas.store'), [
+                'fecha' => '2026-10-21',
+                'hora' => $hora,
+                'servicios' => [1],
+            ]);
+
+            $response->assertRedirect(route('login'));
+            $response->assertSessionHasNoErrors();
+        }
+    }
+
+    public function test_it_requires_at_least_one_service(): void
+    {
+        $response = $this->post(route('citas.store'), [
+            'fecha' => '2026-10-21',
+            'hora' => '10:00',
+        ]);
+
+        $response->assertSessionHasErrors('servicios');
+    }
 }
