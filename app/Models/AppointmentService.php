@@ -15,8 +15,16 @@ class AppointmentService extends Model
 
     protected $fillable = [
         'citaId',
-        'servicioId'
+        'servicioId',
+        'precio_unitario',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'precio_unitario' => 'decimal:2',
+        ];
+    }
 
     public function cita()
     {

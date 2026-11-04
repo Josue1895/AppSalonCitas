@@ -25,7 +25,6 @@ class PasswordResetController extends Controller
         $usuario = User::where('email', $request->email)->first();
 
         if (!$usuario) {
-
             return back()->withErrors([
                 'email' => 'No existe una cuenta con ese correo'
             ]);
@@ -44,25 +43,13 @@ class PasswordResetController extends Controller
 
         $link = url('/reset-password/' . $token . '?email=' . urlencode($request->email));
 
-        Mail::html(
-            "
-            <h2>Recuperación de contraseña</h2>
-
-            <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-
-            <p>
-                <a href='{$link}'>
-                    Restablecer contraseña
-                </a>
-            </p>
-            ",
-            function ($message) use ($request) {
-
-                $message->to($request->email)
-                    ->subject('Recuperación de contraseña - AppSalon');
-
-            }
-        );
+        Mail::send('emails.password-reset', [
+            'usuario' => $usuario,
+            'link' => $link,
+        ], function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Restablece tu contraseña - RELUX');
+        });
 
         return back()->with(
             'success',
@@ -91,14 +78,12 @@ class PasswordResetController extends Controller
             ->first();
 
         if (!$registro) {
-
             return back()->withErrors([
                 'email' => 'Solicitud inválida'
             ]);
         }
 
         if (!Hash::check($request->token, $registro->token)) {
-
             return back()->withErrors([
                 'email' => 'Token inválido'
             ]);
@@ -108,6 +93,12 @@ class PasswordResetController extends Controller
             'email',
             $request->email
         )->first();
+
+        if (!$usuario) {
+            return back()->withErrors([
+                'email' => 'No existe una cuenta con ese correo'
+            ]);
+        }
 
         $usuario->update([
             'password' => $request->password

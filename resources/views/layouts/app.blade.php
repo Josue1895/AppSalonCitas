@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'relux')</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <title>@yield('title', 'RELUX')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
     {{-- Tipografía de títulos (la misma de la portada) --}}
@@ -35,7 +38,7 @@
         }
 
         body {
-            background: linear-gradient(135deg,   #fff6f2, #fdeaee);
+            background: linear-gradient(135deg, #fff6f2, #fdeaee);
             min-height: 100vh;
         }
 
@@ -72,7 +75,7 @@
 
         .text-muted { color: var(--lp-muted) !important; }
 
-        /* Barra de navegación*/
+        /* Barra de navegación */
         .navbar.bg-dark { background-color: var(--lp-ink) !important; }
 
         .navbar .btn-primary {
@@ -151,6 +154,7 @@
             background-color: var(--lp-rose-deep);
             border-color: var(--lp-rose-deep);
         }
+
         .form-check-input:focus {
             border-color: var(--lp-rose);
             box-shadow: 0 0 0 .25rem rgba(244, 163, 168, .35);
@@ -164,7 +168,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('home') }}">Relux</a>
+            <a class="navbar-brand fw-bold" href="{{ route('home') }}">RELUX</a>
 
             <div class="collapse navbar-collapse show">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -192,11 +196,6 @@
                     @if(Auth::check())
                         <span class="text-white">
                             {{ Auth::user()->nombre }}
-                            @if(Auth::user()->admin)
-                                <span class="badge bg-warning text-dark">Admin</span>
-                            @else
-                                <span class="badge bg-info text-dark">Usuario</span>
-                            @endif
                         </span>
 
                         <form action="{{ route('logout') }}" method="POST" class="m-0">

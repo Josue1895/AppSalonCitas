@@ -57,4 +57,13 @@ Route::post('/admin/citas/estado/{id}', [AdminController::class, 'cambiarEstado'
     Route::get('/admin/reportes', [ReportController::class, 'index'])->name('admin.reportes');
     Route::get('/admin/reportes/pdf', [ReportController::class, 'pdf'])->name('admin.reportes.pdf');
     Route::get('/admin/reportes/excel', [ReportController::class, 'excel'])->name('admin.reportes.excel');
-});
+
+    Route::get('/admin/horarios', [AdminController::class, 'horarios'])
+    ->name('admin.horarios');
+
+Route::post('/admin/horarios', [AdminController::class, 'actualizarHorarios'])
+    ->name('admin.horarios.actualizar');
+
+
+
+    });
