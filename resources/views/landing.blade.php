@@ -595,7 +595,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
     <section class="mb-5 py-3">
 
-        <h2 class="lp-display fw-bold mb-1">Reservar una cita solo toma tres pasos</h2>
+        <h2 class="lp-display fw-bold mb-1">Cómo funciona</h2>
 
         <p class="text-muted mb-4">Sin llamadas y sin escribir por mensajes.</p>
 
