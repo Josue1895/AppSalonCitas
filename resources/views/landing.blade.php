@@ -823,7 +823,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
     var fmtLong  = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
 
-    var horas    = ['9:00 a. m.', '10:00 a. m.', '11:00 a. m.', '3:00 p. m.', '4:00 p. m.', '5:00 p. m.'];
+    var horas    = ['8:00 a. m.', '10:00 a. m.', '11:00 a. m.', '3:00 p. m.', '4:00 p. m.', '5:00 p. m.'];
 
     var fechas = [];
 

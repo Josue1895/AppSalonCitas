@@ -68,7 +68,7 @@ class AppointmentDateValidationTest extends TestCase
 
     public function test_it_rejects_times_outside_the_booking_hours(): void
     {
-        foreach (['08:59', '18:01'] as $hora) {
+        foreach (['07:59', '18:01'] as $hora) {
             $response = $this->post(route('citas.store'), [
                 'fecha' => '2026-10-21',
                 'hora' => $hora,
@@ -79,9 +79,9 @@ class AppointmentDateValidationTest extends TestCase
         }
     }
 
-    public function test_it_allows_the_booking_hours_boundaries(): void
+    public function test_it_allows_the_opening_time_and_last_minute_before_closing(): void
     {
-        foreach (['09:00', '18:00'] as $hora) {
+        foreach (['08:00', '17:59'] as $hora) {
             $response = $this->post(route('citas.store'), [
                 'fecha' => '2026-10-21',
                 'hora' => $hora,
