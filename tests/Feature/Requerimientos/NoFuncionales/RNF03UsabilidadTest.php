@@ -9,9 +9,7 @@ use Tests\Feature\Requerimientos\RequerimientoTestCase;
  * RNF-03 Usabilidad: toda acción importante muestra un mensaje claro, verde
  * si salió bien y rojo si hubo un error.
  *
- * RNF-02 (validaciones de horario ocupado y campos vacíos) queda cubierto por
- * RF-05 y RF-06. La versión móvil y RNF-04 (arquitectura MVC) no se pueden
- * verificar con pruebas automáticas de PHPUnit.
+ * RNF-02 y RNF-04 tienen sus propias clases de prueba en esta carpeta.
  */
 #[Group('RNF-03')]
 class RNF03UsabilidadTest extends RequerimientoTestCase

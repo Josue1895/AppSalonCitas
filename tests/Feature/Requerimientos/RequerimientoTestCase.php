@@ -8,6 +8,7 @@ use App\Models\Horario;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,23 @@ abstract class RequerimientoTestCase extends TestCase
 
         $this->crearEsquema();
         $this->crearHorarios();
+        $this->capturarCorreos();
+    }
+
+    /**
+     * La app no envía el correo de reserva cuando detecta un transporte de
+     * prueba ('array' o 'log'). Se registra un transporte propio llamado
+     * 'captura' que guarda los correos en memoria igual que 'array', pero que
+     * la app trata como un envío real. Así se puede ver qué correo saldría.
+     */
+    private function capturarCorreos(): void
+    {
+        Mail::extend('captura', fn () => new ArrayTransport());
+
+        config([
+            'mail.mailers.captura' => ['transport' => 'captura'],
+            'mail.default' => 'captura',
+        ]);
     }
 
     protected function tearDown(): void
@@ -229,7 +247,7 @@ abstract class RequerimientoTestCase extends TestCase
     }
 
     /**
-     * Correos capturados por el mailer "array" (configurado en phpunit.xml).
+     * Correos capturados por el transporte 'captura'.
      *
      * @return Collection<int, \Symfony\Component\Mime\Email>
      */

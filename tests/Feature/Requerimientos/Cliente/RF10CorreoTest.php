@@ -8,43 +8,94 @@ use Tests\Feature\Requerimientos\RequerimientoTestCase;
 /**
  * RF-10 Correo: los avisos de reserva, modificación y confirmación dicen que
  * se envió un correo con la fecha, la hora y el lugar.
- *
- * La modificación no se prueba aquí porque la funcionalidad no existe (ver RF-08).
  */
 #[Group('RF-10')]
 class RF10CorreoTest extends RequerimientoTestCase
 {
-    public function test_al_reservar_se_envia_un_correo_al_cliente(): void
+    private const PATRON_LUGAR = '/direcci[oó]n|lugar|ubicaci[oó]n|Cra\.|Cali/iu';
+
+    // ------------------------------------------------------------------
+    // Reserva
+    // ------------------------------------------------------------------
+
+    public function test_al_reservar_se_envia_un_correo_con_fecha_y_hora(): void
     {
         $cliente = $this->crearCliente(['email' => 'ana@test.com']);
         $servicio = $this->crearServicio();
 
         $this->actingAs($cliente)
-            ->post(route('citas.store'), $this->datosReserva($servicio))
+            ->post(route('citas.store'), $this->datosReserva($servicio, ['hora' => '10:00']))
             ->assertSessionHasNoErrors();
 
-        $this->assertCount(
-            1,
-            $this->correosEnviados(),
-            'Al reservar una cita no se envió ningún correo al cliente.'
-        );
+        $correos = $this->correosEnviados();
+
+        $this->assertCount(1, $correos, 'Al reservar una cita no se envió ningún correo al cliente.');
+        $this->assertSame('ana@test.com', $correos->first()->getTo()[0]->getAddress());
+        $this->assertStringContainsString('21/10/2026', $correos->first()->getHtmlBody());
+        $this->assertStringContainsString('10:00', $correos->first()->getHtmlBody());
     }
 
     public function test_el_aviso_de_reserva_indica_que_se_envio_un_correo(): void
     {
-        $cliente = $this->crearCliente();
         $servicio = $this->crearServicio();
 
-        $this->actingAs($cliente)->post(route('citas.store'), $this->datosReserva($servicio));
+        $this->actingAs($this->crearCliente())
+            ->post(route('citas.store'), $this->datosReserva($servicio))
+            ->assertSessionHas('success', fn ($mensaje) => stripos($mensaje, 'correo') !== false);
+    }
+
+    public function test_el_correo_de_reserva_incluye_el_lugar(): void
+    {
+        $servicio = $this->crearServicio();
+
+        $this->actingAs($this->crearCliente())
+            ->post(route('citas.store'), $this->datosReserva($servicio));
+
+        $this->assertMatchesRegularExpression(
+            self::PATRON_LUGAR,
+            (string) $this->correosEnviados()->first()?->getHtmlBody(),
+            'El correo de reserva no indica el lugar de la cita.'
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // Modificación
+    // ------------------------------------------------------------------
+
+    public function test_al_modificar_se_envia_un_correo_al_cliente(): void
+    {
+        $cliente = $this->crearCliente(['email' => 'ana@test.com']);
+        $servicio = $this->crearServicio();
+        $cita = $this->crearCita($cliente, [], [$servicio]);
+
+        $this->actingAs($cliente)
+            ->put(route('citas.update', $cita->id), $this->datosReserva($servicio, ['hora' => '12:00']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertCount(1, $this->correosEnviados(), 'Al modificar la cita no se envió ningún correo.');
+    }
+
+    public function test_el_aviso_de_modificacion_indica_que_se_envio_un_correo(): void
+    {
+        $cliente = $this->crearCliente();
+        $servicio = $this->crearServicio();
+        $cita = $this->crearCita($cliente, [], [$servicio]);
+
+        $this->actingAs($cliente)
+            ->put(route('citas.update', $cita->id), $this->datosReserva($servicio, ['hora' => '12:00']));
 
         $mensaje = (string) session('success');
 
         $this->assertStringContainsStringIgnoringCase(
             'correo',
             $mensaje,
-            "El aviso de reserva no menciona el correo. Se mostró: \"$mensaje\""
+            "El aviso de modificación no menciona el correo. Se mostró: \"$mensaje\""
         );
     }
+
+    // ------------------------------------------------------------------
+    // Confirmación
+    // ------------------------------------------------------------------
 
     public function test_al_confirmar_se_envia_un_correo_con_fecha_y_hora(): void
     {
@@ -57,12 +108,9 @@ class RF10CorreoTest extends RequerimientoTestCase
         $correos = $this->correosEnviados();
 
         $this->assertCount(1, $correos, 'Al confirmar la cita no se envió el correo.');
-
-        $correo = $correos->first();
-
-        $this->assertSame('ana@test.com', $correo->getTo()[0]->getAddress());
-        $this->assertStringContainsString('21/10/2026', $correo->getHtmlBody());
-        $this->assertStringContainsString('10:00', $correo->getHtmlBody());
+        $this->assertSame('ana@test.com', $correos->first()->getTo()[0]->getAddress());
+        $this->assertStringContainsString('21/10/2026', $correos->first()->getHtmlBody());
+        $this->assertStringContainsString('10:00', $correos->first()->getHtmlBody());
     }
 
     public function test_el_correo_de_confirmacion_incluye_el_lugar(): void
@@ -72,11 +120,9 @@ class RF10CorreoTest extends RequerimientoTestCase
         $this->actingAs($this->crearAdmin())
             ->post(route('admin.citas.estado', $cita->id), ['estado' => 'confirmada']);
 
-        $cuerpo = (string) $this->correosEnviados()->first()?->getHtmlBody();
-
         $this->assertMatchesRegularExpression(
-            '/direcci[oó]n|lugar|ubicaci[oó]n|Cra\.|Cali/iu',
-            $cuerpo,
+            self::PATRON_LUGAR,
+            (string) $this->correosEnviados()->first()?->getHtmlBody(),
             'El correo de confirmación no indica el lugar de la cita.'
         );
     }
