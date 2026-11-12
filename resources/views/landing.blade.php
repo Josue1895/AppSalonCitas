@@ -709,7 +709,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
                             <div class="accordion-body">
 
-                                Sí. Desde “Mis citas” puedes editar la cita o cancelarla.
+                                Sí. Desde “Mis citas” puedes editar la fecha, la hora y los servicios de tus citas pendientes, o cancelarlas.
 
                             </div>
 

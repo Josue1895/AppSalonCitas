@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\Appointment;
 use App\Models\Horario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -68,6 +69,91 @@ class AdminController extends Controller
             'proximasCitas',
             'citasRecientes'
         ));
+    }
+
+    /**
+     * Mostrar usuarios registrados y sus roles.
+     */
+    public function usuarios(Request $request)
+    {
+        $datos = $request->validate([
+            'buscar' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $busqueda = trim($datos['buscar'] ?? '');
+
+        $usuarios = User::query()
+            ->when($busqueda !== '', function ($query) use ($busqueda) {
+                $query->where(function ($query) use ($busqueda) {
+                    $query->where('nombre', 'like', "%{$busqueda}%")
+                        ->orWhere('apellido', 'like', "%{$busqueda}%")
+                        ->orWhere('email', 'like', "%{$busqueda}%");
+                });
+            })
+            ->orderBy('nombre')
+            ->orderBy('apellido')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.usuarios', compact('usuarios', 'busqueda'));
+    }
+
+    /**
+     * Asignar o quitar el rol de administrador a un usuario existente.
+     */
+    public function actualizarRol(Request $request, $id)
+    {
+        $datos = $request->validate([
+            'admin' => ['required', 'boolean'],
+        ]);
+
+        $nuevoRolAdmin = (bool) $datos['admin'];
+
+        $resultado = DB::transaction(function () use ($id, $nuevoRolAdmin) {
+            $administradores = User::where('admin', true)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            $usuario = User::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ((string) $usuario->id === (string) Auth::id() && ! $nuevoRolAdmin) {
+                return 'no_propio';
+            }
+
+            if ((bool) $usuario->admin === $nuevoRolAdmin) {
+                return 'sin_cambios';
+            }
+
+            if ($usuario->admin && ! $nuevoRolAdmin && $administradores->count() <= 1) {
+                return 'ultimo_admin';
+            }
+
+            $usuario->admin = $nuevoRolAdmin;
+            $usuario->save();
+
+            return 'actualizado';
+        });
+
+        if ($resultado === 'no_propio') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'No puedes quitarte a ti mismo el rol de administrador.');
+        }
+
+        if ($resultado === 'ultimo_admin') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'Debe permanecer al menos un administrador en el sistema.');
+        }
+
+        if ($resultado === 'sin_cambios') {
+            return redirect()->route('admin.usuarios')
+                ->with('success', 'El usuario ya tiene ese rol.');
+        }
+
+        return redirect()->route('admin.usuarios')
+            ->with('success', 'El rol del usuario se actualizó correctamente.');
     }
 
     /**

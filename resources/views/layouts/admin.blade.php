@@ -306,6 +306,11 @@
                 Citas
             </a>
 
+            <a href="{{ route('admin.usuarios') }}"
+               class="nav-link {{ request()->routeIs('admin.usuarios*') ? 'active' : '' }}">
+                Usuarios
+            </a>
+
             <a href="{{ route('admin.servicios.index') }}"
                class="nav-link {{ request()->routeIs('admin.servicios.*') ? 'active' : '' }}">
                 Servicios
@@ -378,6 +383,11 @@
                 <a href="{{ route('admin.citas') }}"
                    class="nav-link {{ request()->routeIs('admin.citas*') ? 'active' : '' }}">
                     Citas
+                </a>
+
+                <a href="{{ route('admin.usuarios') }}"
+                   class="nav-link {{ request()->routeIs('admin.usuarios*') ? 'active' : '' }}">
+                    Usuarios
                 </a>
 
                 <a href="{{ route('admin.servicios.index') }}"

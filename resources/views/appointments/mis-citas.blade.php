@@ -42,8 +42,11 @@
                             @endif
                         </p>
                     </div>
-                    <div class="col-md-2 d-flex align-items-center">
+                    <div class="col-md-2 d-flex flex-column justify-content-center gap-2">
                         @if($cita->estado == 'pendiente')
+                            <a href="{{ route('citas.edit', $cita->id) }}" class="btn btn-outline-primary w-100">
+                                Editar
+                            </a>
                             <form action="{{ route('citas.cancelar', $cita->id) }}" method="POST" class="w-100">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-danger w-100">Cancelar</button>
