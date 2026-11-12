@@ -27,6 +27,8 @@ Route::get('/servicios', [ServiceController::class, 'index'])->name('servicios.i
 Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index');
 Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.store');
 Route::get('/mis-citas', [AppointmentController::class, 'misCitas'])->name('citas.mis');
+Route::get('/mis-citas/{id}/editar', [AppointmentController::class, 'edit'])->name('citas.edit');
+Route::put('/mis-citas/{id}', [AppointmentController::class, 'update'])->name('citas.update');
 Route::post('/mis-citas/cancelar/{id}', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
 
 // nueva funcionalidad para recuperar contraseña
@@ -46,6 +48,8 @@ Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']
 // Admin protegido
 Route::middleware('admin')->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
+    Route::put('/admin/usuarios/{id}/rol', [AdminController::class, 'actualizarRol'])->name('admin.usuarios.rol');
     Route::get('/admin/servicios', [ServiceController::class, 'adminIndex'])->name('admin.servicios.index');
     Route::get('/admin/servicios/crear', [ServiceController::class, 'create'])->name('admin.servicios.create');
     Route::post('/admin/servicios', [ServiceController::class, 'store'])->name('admin.servicios.store');
