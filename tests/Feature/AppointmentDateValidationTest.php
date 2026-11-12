@@ -169,12 +169,14 @@ class AppointmentDateValidationTest extends TestCase
         $horario = $this->obtenerHorarioActivo(3);
 
         $servicioId = $this->obtenerServicioId();
+        $horaAntesDeAbrir = Carbon::createFromFormat(
+    'H:i:s',
+    $horario->hora_inicio
+)->subMinute()->format('H:i');
 
-        $horaAnterior = now()->subMinute()->format('H:i');
+$horaDeCierre = substr($horario->hora_fin, 0, 5);
 
-        $horaDeCierre = substr($horario->hora_fin, 0, 5);
-
-        foreach ([$horaAntesDeAbrir, $horaDeCierre] as $hora) {
+foreach ([$horaAntesDeAbrir, $horaDeCierre] as $hora) {
             $response = $this->post(route('citas.store'), [
                 'fecha' => '2026-10-21',
                 'hora' => $hora,
