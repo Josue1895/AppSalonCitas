@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class AppointmentDateValidationTest extends TestCase
@@ -12,6 +15,61 @@ class AppointmentDateValidationTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow(Carbon::parse('2026-10-20 19:00:00', 'UTC'));
+
+        $this->crearTablasNecesarias();
+        $this->sembrarDatos();
+    }
+
+    /**
+     * Las migraciones del proyecto usan SQL exclusivo de MySQL
+     * (UPDATE ... INNER JOIN, ALTER TABLE ... MODIFY), así que no se pueden
+     * ejecutar sobre SQLite en memoria. Creamos solo las tablas que consulta
+     * AppointmentRequest, replicando su estructura final.
+     */
+    private function crearTablasNecesarias(): void
+    {
+        Schema::create('servicios', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre', 60);
+            $table->decimal('precio', 8, 2);
+            $table->text('descripcion')->nullable();
+            $table->integer('duracion')->default(60);
+            $table->boolean('activo')->default(true);
+            $table->timestamp('created_at')->useCurrent();
+        });
+
+        Schema::create('horarios', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedTinyInteger('dia_semana')->unique();
+            $table->time('hora_inicio')->default('08:00:00');
+            $table->time('hora_fin')->default('18:00:00');
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Servicio con id 1 y horario de atención de 08:00 a 18:00 de lunes a
+     * sábado (domingo cerrado), que es lo que asumen estas pruebas.
+     */
+    private function sembrarDatos(): void
+    {
+        DB::table('servicios')->insert([
+            'id' => 1,
+            'nombre' => 'Corte de cabello',
+            'precio' => 20000,
+        ]);
+
+        foreach (range(1, 7) as $dia) {
+            DB::table('horarios')->insert([
+                'dia_semana' => $dia,
+                'hora_inicio' => '08:00:00',
+                'hora_fin' => '18:00:00',
+                'activo' => $dia !== 7,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     protected function tearDown(): void
