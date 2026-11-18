@@ -21,4 +21,11 @@ class RegisterRequest extends FormRequest
             'telefono' => 'nullable|max:10'
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'Este correo ya está registrado.',
+        ];
+    }
 }

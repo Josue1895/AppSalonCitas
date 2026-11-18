@@ -27,14 +27,6 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
     <style>
 
-        /*
-
-           PALETA "ROSA TÉ o asi me dijo chapeto que se llamaba"  (cambien solo estas variables
-
-           para probar mas colores)
-
-        */
-
         :root {
 
             --lp-ink: #4a2332;        /* ciruela oscuro: textos y botones */
@@ -57,7 +49,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
         }
 
-        /* Fondo cálido de la página (solo en la portada) */
+        /* Fondo de la página (solo en la portada) */
 
         body {
 

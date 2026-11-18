@@ -24,8 +24,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/servicios', [ServiceController::class, 'index'])->name('servicios.index');
 
 // Citas
-Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index');
-Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.store');
+Route::get('/citas', [AppointmentController::class, 'index'])
+    ->middleware(['auth', 'cliente'])
+    ->name('citas.index');
+Route::post('/citas', [AppointmentController::class, 'store'])
+    ->middleware(['auth', 'cliente'])
+    ->name('citas.store');
 Route::get('/mis-citas', [AppointmentController::class, 'misCitas'])->name('citas.mis');
 Route::get('/mis-citas/{id}/editar', [AppointmentController::class, 'edit'])->name('citas.edit');
 Route::put('/mis-citas/{id}', [AppointmentController::class, 'update'])->name('citas.update');
@@ -49,6 +53,11 @@ Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']
 Route::middleware('admin')->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
+    Route::get('/admin/usuarios/crear', [AdminController::class, 'crearUsuario'])->name('admin.usuarios.create');
+    Route::post('/admin/usuarios', [AdminController::class, 'guardarUsuario'])->name('admin.usuarios.store');
+    Route::get('/admin/usuarios/{id}/editar', [AdminController::class, 'editarUsuario'])->name('admin.usuarios.edit');
+    Route::put('/admin/usuarios/{id}', [AdminController::class, 'actualizarUsuario'])->name('admin.usuarios.update');
+    Route::delete('/admin/usuarios/{id}', [AdminController::class, 'eliminarUsuario'])->name('admin.usuarios.destroy');
     Route::put('/admin/usuarios/{id}/rol', [AdminController::class, 'actualizarRol'])->name('admin.usuarios.rol');
     Route::get('/admin/servicios', [ServiceController::class, 'adminIndex'])->name('admin.servicios.index');
     Route::get('/admin/servicios/crear', [ServiceController::class, 'create'])->name('admin.servicios.create');

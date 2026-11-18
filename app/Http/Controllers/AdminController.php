@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -98,18 +99,91 @@ class AdminController extends Controller
         return view('admin.usuarios', compact('usuarios', 'busqueda'));
     }
 
-    /**
-     * Asignar o quitar el rol de administrador a un usuario existente.
-     */
-    public function actualizarRol(Request $request, $id)
+    public function crearUsuario()
+    {
+        return view('admin.usuarios.crear');
+    }
+
+    public function guardarUsuario(Request $request)
     {
         $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:60'],
+            'apellido' => ['required', 'string', 'max:60'],
+            'email' => ['required', 'email', 'max:30', 'unique:usuarios,email'],
+            'telefono' => ['nullable', 'string', 'max:10'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
             'admin' => ['required', 'boolean'],
         ]);
 
-        $nuevoRolAdmin = (bool) $datos['admin'];
+        User::create([
+            'nombre' => $datos['nombre'],
+            'apellido' => $datos['apellido'],
+            'email' => $datos['email'],
+            'telefono' => $datos['telefono'] ?? null,
+            'password' => $datos['password'],
+            'admin' => $datos['admin'],
+            'confirmado' => true,
+            'token' => null,
+        ]);
 
-        $resultado = DB::transaction(function () use ($id, $nuevoRolAdmin) {
+        return redirect()->route('admin.usuarios')
+            ->with('success', 'Usuario creado correctamente.');
+    }
+
+    public function editarUsuario($id)
+    {
+        $usuario = User::findOrFail($id);
+
+        return view('admin.usuarios.editar', compact('usuario'));
+    }
+
+    public function actualizarUsuario(Request $request, $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:60'],
+            'apellido' => ['required', 'string', 'max:60'],
+            'email' => [
+                'required',
+                'email',
+                'max:30',
+                Rule::unique('usuarios', 'email')->ignore($usuario->id),
+            ],
+            'telefono' => ['nullable', 'string', 'max:10'],
+            'password' => ['nullable', 'string', 'min:6', 'confirmed'],
+            'admin' => ['required', 'boolean'],
+        ]);
+
+        if (empty($datos['password'])) {
+            unset($datos['password']);
+        }
+
+        $datos['admin'] = (bool) $datos['admin'];
+        $resultado = $this->actualizarDatosUsuario($id, $datos);
+
+        if ($resultado === 'no_propio') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'No puedes quitarte a ti mismo el rol de administrador.');
+        }
+
+        if ($resultado === 'ultimo_admin') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'Debe permanecer al menos un administrador en el sistema.');
+        }
+
+        if ($resultado === 'sin_cambios') {
+            return redirect()->route('admin.usuarios')
+                ->with('success', 'No se realizaron cambios al usuario.');
+        }
+
+        return redirect()->route('admin.usuarios')
+            ->with('success', 'Usuario actualizado correctamente.');
+    }
+
+    public function eliminarUsuario($id)
+    {
+        $resultado = DB::transaction(function () use ($id) {
             $administradores = User::where('admin', true)
                 ->orderBy('id')
                 ->lockForUpdate()
@@ -119,23 +193,45 @@ class AdminController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ((string) $usuario->id === (string) Auth::id() && ! $nuevoRolAdmin) {
+            if ((string) $usuario->id === (string) Auth::id()) {
                 return 'no_propio';
             }
 
-            if ((bool) $usuario->admin === $nuevoRolAdmin) {
-                return 'sin_cambios';
-            }
-
-            if ($usuario->admin && ! $nuevoRolAdmin && $administradores->count() <= 1) {
+            if ($usuario->admin && $administradores->count() <= 1) {
                 return 'ultimo_admin';
             }
 
-            $usuario->admin = $nuevoRolAdmin;
-            $usuario->save();
+            $usuario->delete();
 
-            return 'actualizado';
+            return 'eliminado';
         });
+
+        if ($resultado === 'no_propio') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'No puedes eliminar tu propio usuario.');
+        }
+
+        if ($resultado === 'ultimo_admin') {
+            return redirect()->route('admin.usuarios')
+                ->with('error', 'Debe permanecer al menos un administrador en el sistema.');
+        }
+
+        return redirect()->route('admin.usuarios')
+            ->with('success', 'Usuario eliminado correctamente.');
+    }
+
+    /**
+     * Asignar o quitar el rol de administrador a un usuario existente.
+     */
+    public function actualizarRol(Request $request, $id)
+    {
+        $datos = $request->validate([
+            'admin' => ['required', 'boolean'],
+        ]);
+
+        $resultado = $this->actualizarDatosUsuario($id, [
+            'admin' => (bool) $datos['admin'],
+        ]);
 
         if ($resultado === 'no_propio') {
             return redirect()->route('admin.usuarios')
@@ -154,6 +250,42 @@ class AdminController extends Controller
 
         return redirect()->route('admin.usuarios')
             ->with('success', 'El rol del usuario se actualizó correctamente.');
+    }
+
+    private function actualizarDatosUsuario($id, array $datos): string
+    {
+        return DB::transaction(function () use ($id, $datos) {
+            $administradores = User::where('admin', true)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            $usuario = User::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (array_key_exists('admin', $datos)) {
+                $nuevoRolAdmin = (bool) $datos['admin'];
+
+                if ((string) $usuario->id === (string) Auth::id() && ! $nuevoRolAdmin) {
+                    return 'no_propio';
+                }
+
+                if ($usuario->admin && ! $nuevoRolAdmin && $administradores->count() <= 1) {
+                    return 'ultimo_admin';
+                }
+            }
+
+            $usuario->fill($datos);
+
+            if (! $usuario->isDirty()) {
+                return 'sin_cambios';
+            }
+
+            $usuario->save();
+
+            return 'actualizado';
+        });
     }
 
     /**

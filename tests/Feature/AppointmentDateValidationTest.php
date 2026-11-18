@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use Illuminate\Database\Schema\Blueprint;
+use App\Http\Middleware\ClienteMiddleware;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +16,10 @@ class AppointmentDateValidationTest extends TestCase
     {
         parent::setUp();
 
+        $this->withoutMiddleware([
+            Authenticate::class,
+            ClienteMiddleware::class,
+        ]);
         Carbon::setTestNow(Carbon::parse('2026-10-20 19:00:00', 'UTC'));
 
         $this->crearTablasNecesarias();
