@@ -11,9 +11,14 @@
                     Asigna o quita el rol de administrador a usuarios registrados. Las cuentas no se eliminan.
                 </p>
             </div>
-            <span class="badge rounded-pill bg-light text-dark px-3 py-2">
-                Usuarios: {{ $usuarios->total() }}
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill bg-light text-dark px-3 py-2">
+                    Usuarios: {{ $usuarios->total() }}
+                </span>
+                <a href="{{ route('admin.usuarios.create') }}" class="btn btn-primary">
+                    Crear usuario
+                </a>
+            </div>
         </div>
 
         <form method="GET" action="{{ route('admin.usuarios') }}" class="mb-4">
@@ -69,6 +74,12 @@
                                             @endif
                                         </td>
                                         <td class="text-end">
+                                            <a
+                                                href="{{ route('admin.usuarios.edit', $usuario->id) }}"
+                                                class="btn btn-sm btn-outline-secondary"
+                                            >
+                                                Editar
+                                            </a>
                                             @if($usuario->id !== Auth::id())
                                                 <form
                                                     method="POST"
@@ -88,6 +99,20 @@
                                                         class="btn btn-sm {{ $usuario->admin ? 'btn-outline-danger' : 'btn-outline-primary' }}"
                                                     >
                                                         {{ $usuario->admin ? 'Quitar rol Admin' : 'Asignar rol Admin' }}
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @if($usuario->id !== Auth::id())
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('admin.usuarios.destroy', $usuario->id) }}"
+                                                    class="d-inline"
+                                                    onsubmit="return confirm('¿Eliminar este usuario? Sus citas se conservarán sin asociarse a una cuenta.');"
+                                                >
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        Eliminar
                                                     </button>
                                                 </form>
                                             @else
