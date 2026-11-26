@@ -6,9 +6,14 @@
 
     // El botón cambia si hay sesión o no
 
-    $ctaPrincipalUrl   = Auth::check() ? route('citas.index') : route('registro');
+    $esAdministrador  = Auth::check() && Auth::user()->admin;
+    $ctaPrincipalUrl   = $esAdministrador
+        ? route('admin.index')
+        : (Auth::check() ? route('citas.index') : route('registro'));
 
-    $ctaPrincipalTexto = Auth::check() ? 'Reservar mi cita' : 'Crear mi cuenta';
+    $ctaPrincipalTexto = $esAdministrador
+        ? 'Ir al panel'
+        : (Auth::check() ? 'Reservar mi cita' : 'Crear mi cuenta');
 $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? '') : '';
 
      // Dirección del salón
@@ -537,7 +542,9 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
                     @auth
 
-                        <a href="{{ route('citas.mis') }}" class="lp-link">Ver mis citas</a>
+                        @if(!Auth::user()->admin)
+                            <a href="{{ route('citas.mis') }}" class="lp-link">Ver mis citas</a>
+                        @endif
 
                     @endauth
 

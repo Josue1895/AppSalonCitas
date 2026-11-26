@@ -178,12 +178,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('servicios.index') }}">Servicios</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('citas.index') }}">vamos a reservar una cita</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('citas.mis') }}">Mis Citas</a>
-                    </li>
+                    @if(!Auth::check() || !Auth::user()->admin)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('citas.index') }}">vamos a reservar una cita</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('citas.mis') }}">Mis Citas</a>
+                        </li>
+                    @endif
 
                     @if(Auth::check() && Auth::user()->admin)
                         <li class="nav-item">
