@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ReportController;
 
 // nueva pagina de inicio
-Route::view('/', 'landing')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Autenticación
 Route::get('/registro', [AuthController::class, 'showRegister'])->name('registro');

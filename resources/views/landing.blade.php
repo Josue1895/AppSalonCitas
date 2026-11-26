@@ -639,6 +639,75 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
     </section>
 
+    {{-- ================= SERVICIOS ================= --}}
+
+    <section class="mb-5 py-3">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+
+            <div>
+
+                <h2 class="lp-display fw-bold mb-1">Nuestros servicios</h2>
+
+                <p class="text-muted mb-0">Conoce las opciones disponibles en RELUX.</p>
+
+            </div>
+
+            <a href="{{ route('servicios.index') }}" class="lp-link">Ver todos los servicios</a>
+
+        </div>
+
+        @if($servicios->isEmpty())
+
+            <p class="text-muted mb-0">Pronto encontrarás aquí nuestros servicios.</p>
+
+        @else
+
+            <div class="row g-4">
+
+                @foreach($servicios as $servicio)
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <article class="card border-0 shadow-sm h-100 rounded-4">
+
+                            <div class="card-body">
+
+                                <h3 class="h5 fw-bold">{{ $servicio->nombre }}</h3>
+
+                                <p class="text-muted">{{ $servicio->descripcion ?: 'Descripción próximamente.' }}</p>
+
+                                <p class="mb-2">
+                                    <strong>Precio:</strong>
+                                    ${{ number_format((float) $servicio->precio, 0, ',', '.') }} COP
+                                </p>
+
+                                <p class="mb-0">
+                                    <strong>Duración:</strong> {{ $servicio->duracion }} minutos
+                                </p>
+
+                            </div>
+
+                            <div class="card-footer bg-white border-0">
+
+                                <a href="{{ route('citas.index') }}" class="btn btn-outline-primary w-100">
+                                    Reservar este servicio
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+        @endif
+
+    </section>
+
     {{-- ================= PREGUNTAS FRECUENTES ================= --}}
 
     <section class="mb-5 py-3">
