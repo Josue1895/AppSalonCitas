@@ -1,0 +1,192 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "AppSalon API",
+        "description": "API REST para gestión de citas AppSalon",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/citas/{id}": {
+            "put": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Actualizar cita",
+                "operationId": "2320082afa23b20dcea1f060cb57d9aa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "fecha": {
+                                        "type": "string",
+                                        "example": "2026-06-02"
+                                    },
+                                    "hora": {
+                                        "type": "string",
+                                        "example": "15:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cita actualizada correctamente"
+                    }
+                }
+            }
+        },
+        "/api/citas/usuario/{id}": {
+            "get": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Obtener citas por usuario",
+                "operationId": "b0ec985b80bc5cc0b27957693fbe79d6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de citas"
+                    }
+                }
+            }
+        },
+        "/api/citas": {
+            "post": {
+                "tags": [
+                    "Citas"
+                ],
+                "summary": "Crear cita",
+                "operationId": "4c339b5129b8e732b42c88fa38724aa8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "fecha",
+                                    "hora",
+                                    "usuarioId"
+                                ],
+                                "properties": {
+                                    "fecha": {
+                                        "type": "string",
+                                        "example": "2026-06-01"
+                                    },
+                                    "hora": {
+                                        "type": "string",
+                                        "example": "10:00"
+                                    },
+                                    "usuarioId": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cita creada correctamente"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Iniciar sesión",
+                "description": "Autentica un usuario y genera un token Sanctum",
+                "operationId": "0c1115de39523d7f6d77cdee5517ee77",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "cliente@appsalon.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso"
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas"
+                    }
+                }
+            }
+        },
+        "/api/servicios": {
+            "get": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Obtener servicios",
+                "description": "Obtiene todos los servicios activos",
+                "operationId": "77754eb77137fb1e6efe3eea7f678825",
+                "responses": {
+                    "200": {
+                        "description": "Listado de servicios"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Citas",
+            "description": "Citas"
+        },
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Servicios",
+            "description": "Servicios"
+        }
+    ]
+}

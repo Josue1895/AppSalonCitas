@@ -13,10 +13,19 @@ class AppointmentRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'fecha' => 'required|date',
-            'hora' => 'required',
-            'servicios' => 'required|array|min:1'
+            'hora' => 'required'
         ];
+
+        // Solo exigir servicios al crear cita
+        if ($this->isMethod('post') && !$this->route('id')) {
+
+            $rules['servicios'] = 'required|array|min:1';
+        }
+
+        return $rules;
     }
 }
+
+

@@ -44,9 +44,28 @@ class AuthController extends Controller
         ];
 
         if (Auth::attempt($credenciales)) {
-            $request->session()->regenerate();
-            return redirect()->route('home')->with('success', 'Bienvenido');
-        }
+
+
+$usuario = Auth::user();
+
+if (!$usuario->confirmado) {
+
+    Auth::logout();
+
+    return back()->withErrors([
+        'email' => 'Su cuenta ha sido desactivada por el administrador.'
+    ])->onlyInput('email');
+}
+
+$request->session()->regenerate();
+
+return redirect()
+    ->route('home')
+    ->with('success', 'Bienvenido');
+
+
+}
+
 
         return back()->withErrors([
             'email' => 'Credenciales incorrectas'
