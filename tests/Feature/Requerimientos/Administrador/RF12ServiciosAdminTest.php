@@ -124,7 +124,12 @@ class RF12ServiciosAdminTest extends RequerimientoTestCase
             $respuesta->status(),
             'Eliminar un servicio que ya tiene citas provoca un error 500 en lugar de un aviso.'
         );
-        $respuesta->assertRedirect(route('admin.servicios.index'));
+        $respuesta->assertRedirect(route('admin.servicios.index'))
+            ->assertSessionHas(
+                'error',
+                'No se puede eliminar este servicio porque está asociado a citas existentes.'
+            );
+        $this->assertNotNull($servicio->fresh());
     }
 
     public function test_un_cliente_no_puede_gestionar_servicios(): void
