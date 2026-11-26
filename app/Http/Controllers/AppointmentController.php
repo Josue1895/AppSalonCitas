@@ -329,6 +329,6 @@ class AppointmentController extends Controller
         $cita->save();
 
         return redirect()->route('citas.mis')
-            ->with('success', 'Cita cancelada correctamente');
+            ->with('success', 'Cita cancelada correctamente. El horario quedó disponible para otra reserva.');
     }
 }
