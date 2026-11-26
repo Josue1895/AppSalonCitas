@@ -120,4 +120,7 @@ Contraseña: 123456
 
 ## Autor
 
-Proyecto desarrollado por Josue Guzman.
+Proyecto desarrollado por Jhon montaño
+Catherin Torres
+Kevin
+Josue Guzman.
