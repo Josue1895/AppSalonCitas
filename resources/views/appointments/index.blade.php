@@ -69,14 +69,14 @@
                             <h5 class="fw-bold mb-3">Selecciona los servicios</h5>
 
                             @error('servicios')
-                                <div class="alert alert-warning" role="alert">
+                                <div class="alert alert-danger" role="alert">
                                     {{ $message }}
                                 </div>
                             @enderror
 
                             <div
                                 id="servicios-aviso"
-                                class="alert alert-warning"
+                                class="alert alert-danger"
                                 role="alert"
                                 aria-live="assertive"
                                 hidden
