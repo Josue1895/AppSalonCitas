@@ -45,7 +45,7 @@
                     <div class="col-md-2 d-flex flex-column justify-content-center gap-2">
                         @if($cita->estado == 'pendiente')
                             <a href="{{ route('citas.edit', $cita->id) }}" class="btn btn-outline-primary w-100">
-                                Editar
+                                Modificar
                             </a>
                             <form action="{{ route('citas.cancelar', $cita->id) }}" method="POST" class="w-100">
                                 @csrf
