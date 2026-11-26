@@ -122,6 +122,20 @@
                         </td>
 
                         <td>
+                            @if($cita->estado === 'pendiente')
+                                <form
+                                    action="{{ route('admin.citas.estado', $cita->id) }}"
+                                    method="POST"
+                                    class="mb-2"
+                                >
+                                    @csrf
+                                    <input type="hidden" name="estado" value="confirmada">
+                                    <button type="submit" class="btn btn-sm btn-success w-100">
+                                        Confirmar
+                                    </button>
+                                </form>
+                            @endif
+
                             <form
                                 action="{{ route('admin.citas.estado', $cita->id) }}"
                                 method="POST"
