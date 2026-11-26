@@ -47,7 +47,7 @@ class HomeServicesTest extends TestCase
         $response->assertOk()
             ->assertSee('Corte de cabello')
             ->assertSee('Corte personalizado')
-            ->assertSee('$25.000 COP')
+            ->assertSee('$25000.00 COP')
             ->assertSee('45 minutos')
             ->assertDontSee('Servicio inactivo');
     }
