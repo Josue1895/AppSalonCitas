@@ -45,6 +45,12 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td style="padding:9px 0;color:#8a5a69;border-bottom:1px solid #f3e4e5;">Lugar</td>
+                                    <td align="right" style="padding:9px 0;color:#4a2332;font-weight:bold;border-bottom:1px solid #f3e4e5;">
+                                        {{ config('app.salon_address') }}
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td style="padding:9px 0;color:#8a5a69;">Total</td>
                                     <td align="right" style="padding:9px 0;color:#4a2332;font-weight:bold;">
                                         ${{ number_format((float) $cita->total, 0, ',', '.') }} COP

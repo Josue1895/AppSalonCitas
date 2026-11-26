@@ -84,6 +84,8 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'es_ES'),
 
+    'salon_address' => env('SALON_ADDRESS', 'Cra. 24c # 85-29, Cali, Valle del Cauca'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

@@ -13,7 +13,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
      // Dirección del salón
 
-    $direccion = 'Cra. 24c # 85-29, Cali, Valle del Cauca';
+    $direccion = config('app.salon_address');
 
 @endphp
 
@@ -679,7 +679,7 @@ $nombreUsuario = Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name ?? 
 
                                 <p class="mb-2">
                                     <strong>Precio:</strong>
-                                    ${{ number_format((float) $servicio->precio, 0, ',', '.') }} COP
+                                    ${{ $servicio->precio }} COP
                                 </p>
 
                                 <p class="mb-0">

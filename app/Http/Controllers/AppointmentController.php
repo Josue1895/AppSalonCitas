@@ -248,46 +248,52 @@ class AppointmentController extends Controller
                 ->with('error', 'Solo puedes editar citas pendientes.');
         }
 
-        if (! $citaId) {
-            $cita = Appointment::with(['usuario', 'citasServicios.servicio'])
-                ->findOrFail($resultado);
-            $usuario = $cita->usuario;
+        $cita = Appointment::with(['usuario', 'citasServicios.servicio'])
+            ->findOrFail($resultado);
+        $usuario = $cita->usuario;
+        $mensajeExito = $citaId
+            ? 'Cita actualizada correctamente.'
+            : 'Cita reservada correctamente.';
 
-            if (! $usuario || empty($usuario->email)) {
-                return redirect()->route('citas.mis')
-                    ->with('success', 'Cita reservada correctamente.')
-                    ->with('error', 'No se pudo enviar la confirmación porque no hay un correo registrado.');
-            }
+        if (! $usuario || empty($usuario->email)) {
+            return redirect()->route('citas.mis')
+                ->with('success', $mensajeExito)
+                ->with('error', 'No se pudo enviar la notificación porque no hay un correo registrado.');
+        }
 
-            $mailer = config('mail.default');
-            $transport = config("mail.mailers.{$mailer}.transport");
+        $mailer = config('mail.default');
+        $transport = config("mail.mailers.{$mailer}.transport");
 
-            if (in_array($transport, ['log', 'array'], true)) {
-                return redirect()->route('citas.mis')
-                    ->with('success', 'Cita reservada correctamente.')
-                    ->with('error', 'El correo no se envió: la aplicación está usando un transporte de prueba. Configura SMTP para entregarlo.');
-            }
+        if (in_array($transport, ['log', 'array'], true)) {
+            return redirect()->route('citas.mis')
+                ->with('success', $mensajeExito)
+                ->with('error', 'El correo no se envió: la aplicación está usando un transporte de prueba. Configura SMTP para entregarlo.');
+        }
 
-            try {
-                Mail::send('emails.cita-reservada', [
-                    'usuario' => $usuario,
-                    'cita' => $cita,
-                ], function ($message) use ($usuario, $cita) {
-                    $message->to($usuario->email)
-                        ->subject('Confirmación de tu cita - RELUX | Cita #'.$cita->id);
-                });
-            } catch (Throwable $exception) {
-                report($exception);
+        $vistaCorreo = $citaId ? 'emails.cita-actualizada' : 'emails.cita-reservada';
+        $asuntoCorreo = $citaId
+            ? 'Actualización de tu cita - RELUX | Cita #'.$cita->id
+            : 'Confirmación de tu cita - RELUX | Cita #'.$cita->id;
 
-                return redirect()->route('citas.mis')
-                    ->with('success', 'Cita reservada correctamente.')
-                    ->with('error', 'No se pudo enviar el correo de confirmación. Verifica la configuración SMTP.');
-            }
+        try {
+            Mail::send($vistaCorreo, [
+                'usuario' => $usuario,
+                'cita' => $cita,
+            ], function ($message) use ($usuario, $asuntoCorreo) {
+                $message->to($usuario->email)
+                    ->subject($asuntoCorreo);
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()->route('citas.mis')
+                ->with('success', $mensajeExito)
+                ->with('error', 'No se pudo enviar el correo de notificación. Verifica la configuración SMTP.');
         }
 
         return redirect()->route('citas.mis')
             ->with('success', $citaId
-                ? 'Cita actualizada correctamente.'
+                ? 'Cita actualizada correctamente. Te enviamos la confirmación a tu correo.'
                 : 'Cita reservada correctamente. Te enviamos la confirmación a tu correo.');
     }
 
