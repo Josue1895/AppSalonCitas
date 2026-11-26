@@ -228,7 +228,7 @@
             @endif
 
             @if($errors->any())
-                <div class="alert alert-warning shadow-sm rounded-4">
+                <div class="alert alert-danger shadow-sm rounded-4">
                     @foreach($errors->all() as $error)
                         <div>{{ $error }}</div>
                     @endforeach

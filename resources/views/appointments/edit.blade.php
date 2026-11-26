@@ -57,7 +57,7 @@
                             <h5 class="fw-bold mb-3">Servicios</h5>
 
                             @error('servicios')
-                                <div class="alert alert-warning" role="alert">
+                                <div class="alert alert-danger" role="alert">
                                     {{ $message }}
                                 </div>
                             @enderror
