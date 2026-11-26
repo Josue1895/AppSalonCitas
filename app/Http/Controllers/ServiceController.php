@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
@@ -73,10 +74,27 @@ public function update(Request $request, $id)
 
 public function destroy($id)
 {
-    $servicio = Service::findOrFail($id);
-    $servicio->delete();
+    $eliminado = DB::transaction(function () use ($id) {
+        $servicio = Service::whereKey($id)
+            ->lockForUpdate()
+            ->firstOrFail();
 
-    return redirect()->route('admin.servicios.index')->with('success', 'Servicio eliminado correctamente');
+        if ($servicio->citasServicios()->exists()) {
+            return false;
+        }
+
+        $servicio->delete();
+
+        return true;
+    });
+
+    if (! $eliminado) {
+        return redirect()->route('admin.servicios.index')
+            ->with('error', 'No se puede eliminar este servicio porque está asociado a citas existentes.');
+    }
+
+    return redirect()->route('admin.servicios.index')
+        ->with('success', 'Servicio eliminado correctamente');
 }
 
 
